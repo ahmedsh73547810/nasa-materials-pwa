@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0B1026">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NASA Materials">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>NASA Space Apps Cairo - Materials</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #0B1026;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+    }
+    .app-shell {
+      position: fixed;
+      inset: 0;
+      background: #0B1026;
+    }
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #0B1026;
+    }
+    #installBar {
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 20;
+      display: none;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(11, 16, 38, .96);
+      color: white;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding: 12px;
+      box-shadow: 0 12px 32px rgba(0,0,0,.28);
+    }
+    #installBar strong { font-size: 14px; }
+    #installBtn {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg,#f28c28,#7b3fb3);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #dismissBtn {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <iframe
+      src="https://script.google.com/macros/s/AKfycbwa3WPXybwpIkAzfSLsdrH5f4BpeUjX9SK1FpC9qPoDgb6LhHP6eZP-VRuvwZ8pL5s/exec"
+      title="NASA Space Apps Cairo Materials"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allow="camera; microphone; clipboard-read; clipboard-write">
+    </iframe>
+  </div>
+
+  <div id="installBar" role="status" aria-live="polite">
+    <div>
+      <strong>ثبّت NASA Materials كتطبيق</strong>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="installBtn" type="button">تثبيت</button>
+      <button id="dismissBtn" type="button" aria-label="إغلاق">×</button>
+    </div>
+  </div>
+
+  <script>
+    let deferredPrompt = null;
+    const installBar = document.getElementById('installBar');
+    const installBtn = document.getElementById('installBtn');
+    const dismissBtn = document.getElementById('dismissBtn');
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBar.style.display = 'flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBar.style.display = 'none';
+    });
+
+    dismissBtn.addEventListener('click', () => {
+      installBar.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredPrompt = null;
+      installBar.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
